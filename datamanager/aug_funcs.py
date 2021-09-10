@@ -4,7 +4,7 @@ DataManager class.
 '''
 # +++ IMPORTS
 import torch
-from .bbox_util import bb_xywh_to_cs, bb_cs_to_xywh, bb_cs_iou
+from datamanager.bbox_util import bb_xywh_to_cs, bb_cs_to_xywh, bb_cs_iou
 
 # +++ STATIC GLOBAL VARIABLES
 _CUDA_DEVICE = 'cuda:0'

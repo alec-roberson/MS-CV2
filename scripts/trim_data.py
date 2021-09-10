@@ -15,7 +15,6 @@ once you are done the data will be saved to your specified output file.
 # +++ imports
 from datamanager import DataParser
 
-
 # +++ PREFERENCES
 RAW_DATA_PATH = 'raw-data'
 CLASS_NAMES_PATH = 'class-names.txt'

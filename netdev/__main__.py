@@ -32,7 +32,6 @@ if __name__ == '__main__':
     # run the command
     if args.command == 'F':
         find_anchors(args.data_path, args.input_dim, args.num_anchors)
-        
     elif args.command == 'T':
         # architecture testing
         arch_test(args.cfg_path, args.batch_size, args.stop_at)

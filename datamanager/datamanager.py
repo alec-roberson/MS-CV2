@@ -9,9 +9,9 @@ from math import log10, ceil
 import torch
 import cv2
 from tqdm import tqdm
-from .bbox_util import bb_xywh_to_cs
-from .aug_funcs import AUG_FUNCS
-from .misc import mkdir
+from datamanager.bbox_util import bb_xywh_to_cs
+from datamanager.aug_funcs import AUG_FUNCS
+from datamanager.misc import mkdir
 
 
 # +++ STATIC GLOBAL VARIABLES

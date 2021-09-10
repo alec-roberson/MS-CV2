@@ -9,7 +9,7 @@ import numpy as np
 import torch
 import matplotlib
 import matplotlib.pyplot as plt
-from .datamanager import DataManager
+from datamanager.datamanager import DataManager
 
 # # set the backend
 # matplotlib.use("Qt5agg")

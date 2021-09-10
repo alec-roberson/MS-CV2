@@ -1,7 +1,7 @@
 ''' datamanager module
 '''
 
-from .dataparser import DataParser, load_labels, load_images
-from .datamanager import DataManager
-from . import aug_funcs
-from .misc import *
+from datamanager.dataparser import DataParser, load_labels, load_images
+from datamanager.datamanager import DataManager
+from datamanager import aug_funcs
+from datamanager.misc import *
