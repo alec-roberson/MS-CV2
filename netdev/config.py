@@ -1,5 +1,5 @@
-'''
-reads config files
+''' config.py
+Super useful file for reading config files.
 '''
 
 # +++ GLOBAL VARIABLES
