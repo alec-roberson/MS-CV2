@@ -1,9 +1,8 @@
-
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
-import argparse
-from config import read_cfg
+''' arch_test.py
+This file contains functions useful for testing and developing network
+architectures.
+'''
+from netdev.config import read_cfg
 
 # +++ FUNCTIONS
     # for calculating the output size of each layer based on that layer's type,
@@ -142,24 +141,27 @@ def format_args(args):
     return out
 
 # +++ main code
-if __name__ == '__main__':
-    # +++ parse the arguments
-    parser = argparse.ArgumentParser()
-    parser.add_argument('cfg_path',
-        help='the relative path to the config (.cfg) file to test')
-    parser.add_argument('--batch_size', dest='batch_size', default=32,
-        type=int, help='the batch size (default: 32)')
-    parser.add_argument('--stop_at', dest='stop_at', default=None,
-        type=int, help='after which layer to stop the testing loop, if desired')
-    args = parser.parse_args()
+def arch_test(cfg_path, batch_size, stop_at):
+    ''' arch_test function
+    Test a given network architecture.
     
+    Parameters
+    ----------
+    cfg_path : str
+        String path to the config file to test.
+    batch_size : int
+        Batch size for testing.
+    stop_at : int
+        The layer number to stop after. If None, the whole network will be
+        tested.
+    '''
     # +++ read the config file
-    blocks = read_cfg(args.cfg_path) # read the config file
+    blocks = read_cfg(cfg_path) # read the config file
     net_block = blocks[0] # get the network block
 
     # +++ get the input size to the network
     xsize = (
-        args.batch_size, 
+        batch_size, 
         net_block['channels'], 
         net_block['input_dim'], 
         net_block['input_dim'])
@@ -240,7 +242,7 @@ if __name__ == '__main__':
                 print(f'    {arg}: {layer_args[arg]}')
         print(f'=> {xsize}') # print output size
 
-        if n == args.stop_at:
+        if n == stop_at:
             print(f'testing stopped after layer {n}')
             break
     det_lns = str(det_lns)[1:-1] # detection layers string

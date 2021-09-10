@@ -11,7 +11,7 @@ import cv2
 from tqdm import tqdm
 from .bbox_util import bb_xywh_to_cs
 from .aug_funcs import AUG_FUNCS
-from .parse_data import mkdir
+from .misc import mkdir
 
 
 # +++ STATIC GLOBAL VARIABLES

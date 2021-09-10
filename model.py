@@ -13,7 +13,7 @@ import torch.nn as nn
 
 # from util import * # import utility functions
 # from util import *
-from config import read_cfg # import function to read config file
+from netdev import read_cfg # import function to read config file
 from network_blocks import NET_BLOCKS, DetBlock # import network blocks
 
 class NetworkModel(nn.Module):

@@ -2,10 +2,19 @@
 this file contains functions like show_img
 
 '''
+import os
 import torch
 import numpy as np
 import matplotlib.pyplot as plt
 import cv2
+
+def mkdir(*paths):
+    # function to make directories and sub directories
+    path = os.path.join(*paths)
+    path = os.path.realpath(path)
+    if not os.path.isdir(path):
+        os.mkdir(path)
+    return path
 
 def show_img(imgarr):
     if isinstance(imgarr, torch.Tensor):
