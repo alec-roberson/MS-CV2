@@ -5,7 +5,7 @@ assembled from the config files.
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from util import make_tup, wh_iou_mat, bbox_xywh_ious
+from network.util import make_tup, wh_iou_mat, bbox_xywh_ious
 
 # +++ custom activation functions
 

@@ -6,7 +6,7 @@ images, save copies of the images with the detections shown, etc.
 import os
 import torch
 import cv2
-from util import unique, c1c2_iou_mat
+from network.util import unique, c1c2_iou_mat
 from datamanager.datamanager import DataManager
 
 

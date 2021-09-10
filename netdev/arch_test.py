@@ -3,37 +3,11 @@ This file contains functions useful for testing and developing network
 architectures.
 '''
 from netdev.config import read_cfg
+from network.util import make_tup
 
 # +++ FUNCTIONS
     # for calculating the output size of each layer based on that layer's type,
     # parameters, and the output size from the layer before it
-
-def make_tup(val, tup_len=2, expand_method=0):
-    '''
-    a helpful little function to make arbitrary values into tuples, for instance
-    an input of x will be returned as a tuple (x,x), or if tup_len=4, (x,x,x,x).
-    '''
-    # make sure it's the right tuple length
-    assert tup_len in [2,4], f'tup_len must be 2 or 4, not {tup_len}'
-
-    if isinstance(val, int): # if it's an int
-        return (val,) * tup_len # return it as tuple w/ right length
-    elif isinstance(val, (tuple, list)): # if it's a tuple or list
-        if len(val) == tup_len: # if it already has the right length
-            return val # return it as is
-        elif len(val) * 2 == tup_len: # if it's half the right length
-            if expand_method == 0: # if we should duplicate
-                return val * 2 # double it and return
-            elif expand_method == 1: # if we should expand
-                a, b = val # split up the tup
-                return (a,a,b,b) # return the expanded tuple
-            else: # otherwise (error)
-                raise ValueError(f'unknown expand method {expand_method}')
-        else: # otherwise (error)
-            raise AttributeError(f'cannot convert a tuple with length {len(val)} ' + \
-                f'to a tuple of length {tup_len}')
-    else: # otherwise (type error)
-        raise TypeError(f'cannot call make_tup on argument val with type {type(val).__name__}')
 
 def convolution(insize, filters, kernel_size, stride=1, padding=0):
     '''

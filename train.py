@@ -8,7 +8,7 @@ import torch
 import torch.optim as optim
 from torch.utils.tensorboard import SummaryWriter
 
-from model import NetworkModel
+from network.model import NetworkModel
 from datamanager import DataManager
 
 

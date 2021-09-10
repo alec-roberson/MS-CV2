@@ -10,11 +10,8 @@ last updated 01/09/2021
 import copy
 import torch
 import torch.nn as nn
-
-# from util import * # import utility functions
-# from util import *
 from netdev import read_cfg # import function to read config file
-from network_blocks import NET_BLOCKS, DetBlock # import network blocks
+from network.network_blocks import NET_BLOCKS, DetBlock # import network blocks
 
 class NetworkModel(nn.Module):
     ''' network model
