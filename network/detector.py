@@ -8,6 +8,7 @@ import torch
 import cv2
 from network.util import unique, c1c2_iou_mat
 from datamanager.datamanager import DataManager
+from network.model import NetworkModel
 
 
 class Detector(object):
@@ -20,14 +21,14 @@ class Detector(object):
     CUDA : bool, optional (default=False)
         if true, detections will use the GPU instead of the CPU (default).
     '''
-    def __init__(self, yolo_net_path, CUDA=False):
+    def __init__(self, state_dict_path, cfg_file, CUDA=False):
         # +++ set device variable
         self.device = 'cuda:0' if CUDA else 'cpu'
 
         # +++ load and configure the yolo network
-        f = open(yolo_net_path, 'rb') 
-        self.model = torch.load(f)
-        f.close()
+        self.model = NetworkModel(cfg_file)
+        with open(state_dict_path, 'rb') as f:
+            self.model.load_state_dict(torch.load(state_dict_path))
         self.model.to(self.device)
         self.model.eval()
 
@@ -288,14 +289,3 @@ class Detector(object):
         for path, img in zip(det_paths, det_images):
             cv2.imwrite(path, img)
 
-if __name__ == '__main__':
-    det = Detector('yv3m-t-416-0.pt', CUDA=True)
-
-    import time
-
-    tstart = time.time()
-    det.detect('data/test-data-t-416.pt', batch_size=1,
-        results_dir='results-yv3m-t-416-0', nms_by='image')
-    tend = time.time()
-
-    print(f'detection took {tend-tstart}')
