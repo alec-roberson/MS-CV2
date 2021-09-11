@@ -3,86 +3,13 @@ this file trains the network.
 '''
 
 # +++ imports
-import json
-import argparse
 from tqdm import tqdm
-
-import torch
+import torch 
 import torch.optim as optim
 from torch.utils.tensorboard import SummaryWriter
 
 from network.model import NetworkModel
 from datamanager import DataManager
-
-if __name__ == '__main__':
-    # +++ setup the parser
-    parser = argparse.ArgumentParser()
-    # 
-    # network
-    network_args = parser.add_argument_group('network args')
-    network_args.add_argument('--net-config', '-nc',
-        type=str, default=None, dest='net_config')
-    network_args.add_argument('--net-base-name', '-nbn',
-        type=str, default=None, dest='net_base_name')
-    # data
-    data_args = parser.add_argument_group('data args')
-    data_args.add_argument('--train-data', '-trd',
-        type=str, default=None, dest='train_data')
-    data_args.add_argument('--test-data', '-ted',
-        type=str, default=None, dest='test_data')
-    # data aug
-    data_aug_args = parser.add_argument_group('data augmentation args')
-    data_aug_args.add_argument('--mosaic',
-        type=float, default=None, dest='mosaic')
-    data_aug_args.add_argument('--mixup',
-        type=float, default=None, dest='mixup')
-    data_aug_args.add_argument('--cutmix',
-        type=float, default=None, dest='cutmix')
-    data_aug_args.add_argument('--cutout',
-        type=float, default=None, dest='cutout')
-    data_aug_args.add_argument('--hflip',
-        type=float, default=None, dest='hflip')
-    data_aug_args.add_argument('--vflip',
-        type=float, default=None, dest='vflip')
-    data_aug_args.add_argument('--rot',
-        type=float, default=None, dest='rot')
-    data_aug_args.add_argument('--iou_thresh', nargs=2,
-        type=float, default=None, dest='iou_thresh')
-    data_aug_args.add_argument('--cut_range', nargs=2,
-        type=float, default=None, dest='cut_range')
-    # training parameters
-    training_args = parser.add_argument_group('training args')
-    training_args.add_argument('--batch-size', '-bs',
-        type=int, default=None, dest='batch_size')
-    training_args.add_argument('--mini-batch-size', '-mbs',
-        type=int, default=None, dest='mini_batch_size')
-    training_args.add_argument('--learning-rate', '-lr',
-        type=float, default=None, dest='learning_rate')
-    training_args.add_argument('--weight-decay', '-wd',
-        type=float, default=None, dest='weight_decay')
-    training_args.add_argument('--momentum', '-mom',
-        type=float, default=None, dest='momentum')
-    # tensorboard args
-    tb_args = parser.add_argument_group('tensorboard args')
-    tb_args.add_argument('--write-every',
-        type=int, default=None, dest='write_every')
-    tb_args.add_argument('--tb-logs-dir',
-        type=str, default=None, dest='tb_logs_dir')
-    # cuda args
-    cuda_args = parser.add_argument_group('cuda args')
-    cuda_args.add_argument('--cuda-device',
-        type=str, default=None, dest='cuda_device')
-    cuda_args.add_argument('--aug-cuda',
-        type=bool, default=None, dest='augmentation_cuda')
-    cuda_args.add_argument('--train-cuda',
-        type=bool, default=None, dest='training_cuda')
-    # +++ read json and parse the arguments
-    
-        
-    args = parser.parse_args()
-    print(args.iou_thresh, args.cut_range)
-    quit()
-
 
 
 # +++ file locations
