@@ -37,7 +37,7 @@ DATA_AUG = {}
 # +++ training prefrences
 CUDA = False # should cuda be used for the network
 NUM_EPOCHS = 10 # number of epochs to run for
-WRITE_EVERY = 1 # tensorboard data will be written every ___ epochs
+WRITE_EVERY = 2 # tensorboard data will be written every ___ epochs
 
 # +++ optimizer prefrences
 LEARNING_RATE = 0.001 # learning rate
@@ -161,5 +161,5 @@ model.eval()
 
 # +++ save the model
 f = open(SAVE_NET, 'wb')
-torch.save(model, f)
+torch.save(model.state_dict(), f)
 f.close()
