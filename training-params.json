@@ -1,0 +1,41 @@
+{
+    "network": 
+    {
+        "net_config": "cfg/yolov3_mid_256.cfg",
+        "net_base_name": "yv3m_512"
+    },
+    "data": {
+        "train_data": "T_test_256.pt",
+        "test_data": "T_test_256.pt"
+    },
+    "data_augmentation": {
+        "mosaics": 0.25,
+        "mixup": 0.25,
+        "cutmix": 0.25,
+        "cutout": 0.25,
+
+        "hflip": 0.25,
+        "vflip": 0.25,
+        "rot": 0.25,
+
+        "iou_thresh": [0.7, 0.2],
+        "cut_range": [0.3, 0.5]
+    },
+    "training": {
+        "batch_size": 10,
+        "mini_batch_size": 10,
+        "num_epochs": 2,
+        "learning_rate": 0.001,
+        "weight_decay": 0.001,
+        "momentum": 0.9
+    },
+    "tensorboard": {
+        "write_every": 1,
+        "logs_dir": "runs"
+    },
+    "cuda": {
+        "cuda_device": "cuda:0",
+        "augmentation_cuda": false,
+        "training_cuda": false
+    }
+}

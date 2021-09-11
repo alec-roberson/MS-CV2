@@ -6,7 +6,8 @@ this file trains the network.
 from cgi import test
 import os
 from tqdm import tqdm
-import torch 
+
+import torch
 import torch.optim as optim
 import argparse
 import configparser
