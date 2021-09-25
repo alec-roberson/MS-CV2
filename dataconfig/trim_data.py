@@ -16,7 +16,7 @@ once you are done the data will be saved to your specified output file.
 from datamanager import DataParser
 
 # +++ PREFERENCES
-RAW_DATA_PATH = 'raw-data'
+RAW_DATA_PATH = 'data-test2'
 CLASS_NAMES_PATH = 'class-names.txt'
 RESIZE_DIM = 256
 OUTPUT_TRAINING_DATA = 'data/train-data-t'
