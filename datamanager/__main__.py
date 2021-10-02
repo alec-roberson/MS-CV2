@@ -55,7 +55,7 @@ if __name__ == '__main__':
         help='the size that each image will be resized to in the resulting dataset')
     pd_parser.add_argument('--train-out', dest='train_out', type=str, default='train-data',
         help='the path to the output file for the training data with no extension (defualt=train-data)')
-    pd_parser.add_argument('--test-out', dest='test_out', type=str, default='test-data.pt',
+    pd_parser.add_argument('--test-out', dest='test_out', type=str, default='test-data',
         help='the path to the output file for the testing data with no extension (defualt=test-data)')
     pd_parser.add_argument('--pct-test', dest='pct_test', type=float, default=0.1,
         help='the percentage of data that should be allocated to testing')
