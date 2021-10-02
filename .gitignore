@@ -1,8 +1,11 @@
+# system stuff
 /__pycache__
 /*/__pycache__
 /.vscode
-/data
-/data-test
-/runs
+
+# data stuff
 /*.pt
-/test.py
+/raw-data
+
+# folders to ignore
+/runs
