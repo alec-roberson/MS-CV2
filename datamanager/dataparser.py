@@ -155,6 +155,7 @@ class DataParser:
         provided.
     '''
     def __init__(self, raw_data_path, class_file, resize_dim, suppress_warnings=False):
+        self.raw_data_path = raw_data_path
         # load the class names
         self.classes = load_classes(class_file)
         # load all the data
@@ -194,6 +195,44 @@ class DataParser:
         torch.save((data[:test_n], self.classes, self.resize_dim), f'{test_fn}.pt')
         torch.save((data[test_n:], self.classes, self.resize_dim), f'{train_fn}.pt')
         return data.shape[0] - test_n, test_n
+    
+    def save_raw(self, output_dir:str, keep_fns=False, round_lbls_to=6) -> None:
+        ''' save_raw
+        Saves the raw image files to the directory given.
+
+        Parameters
+        ----------
+        output_dir : str
+            The output directory that the new files should be saved to.
+        '''
+        # setup the file names
+        if keep_fns:
+            filenames = list(self.data[:,0])
+        else:
+            n = self.data.shape[0]
+            ndig = int(np.ceil(np.log10(n)))
+            filenames = [f'img{i:0>{ndig}}' for i in range(n)]
+        # configure the output folder
+        if os.path.exists(output_dir):
+            raise FileExistsError(f'output directory \'{output_dir}\' already exists! process aborted')
+        else:
+            os.makedirs(output_dir)
+        # save all the things
+        for i, fn in enumerate(filenames):
+            # save the image
+            cv2.imwrite(
+                os.path.join(
+                    output_dir, f'{filenames[i]}.jpg'), 
+                self.data[i][1])
+            # put together and save the label
+            lbl_file_txt = ''
+            for lbl in self.data[i][4]:
+                lbl_file_txt += str(int(lbl[0])) + ' '
+                lbl_file_txt += ' '.join([f'{x.item():.{round_lbls_to}}' for x in lbl[1:]]) + '\n'
+            # save the label
+            with open(os.path.join(
+                output_dir, f'{filenames[i]}.txt'), 'w+') as f:
+                f.write(lbl_file_txt)
 
     def trim_data(self, temp_data_fn='~TEMPDATA.pt'):
         ''' trim data
@@ -229,7 +268,7 @@ class DataParser:
             fig.canvas.flush_events()
             # get the input and record the index
             inp = input(f'{i} > ')
-            if inp.strip() == '':
+            if inp == '':
                 keep_idxs.append(i)
             # clear the axes
             ax.cla()
