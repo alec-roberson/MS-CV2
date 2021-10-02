@@ -270,6 +270,8 @@ class DataParser:
             inp = input(f'{i} > ')
             if inp == '':
                 keep_idxs.append(i)
+            elif inp.lower() == 'quit':
+                quit()
             # clear the axes
             ax.cla()
         # close the plot
