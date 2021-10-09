@@ -13,10 +13,10 @@ from datamanager import DataManager
 
 
 # +++ file locations
-NET_CFG = 'cfg/yolov3-mid-256.cfg' # 'cfg/squeezedet.cfg' # network configuration file
-TRAIN_FILE = 'T-test-256.pt' # training images/labels directory
-TEST_FILE = 'T-test-256.pt' # testing images/labels directory
-NET_NAME = 'TESTING-yv3m-256' # where to save the network after training
+NET_CFG = 'cfg/yolov3-mid-416.cfg' # 'cfg/squeezedet.cfg' # network configuration file
+TRAIN_FILE = 'data/train-data-416.pt' # training images/labels directory
+TEST_FILE = 'data/test-data-416.pt' # testing images/labels directory
+NET_NAME = 'yv3m-416-test' # where to save the network after training
 TB_LOGDIR = 'runs/' + NET_NAME # log for tensorboard
 SAVE_NET = NET_NAME + '.pt' # file to save net to
 
@@ -35,7 +35,7 @@ DATA_AUG = {}
 # }
 
 # +++ training prefrences
-CUDA = False # should cuda be used for the network
+CUDA = True # should cuda be used for the network
 NUM_EPOCHS = 10 # number of epochs to run for
 WRITE_EVERY = 2 # tensorboard data will be written every ___ epochs
 
