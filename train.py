@@ -6,6 +6,7 @@ this file trains the network.
 from tqdm import tqdm
 import torch 
 import torch.optim as optim
+import argparse
 from torch.utils.tensorboard import SummaryWriter
 
 from network.model import NetworkModel
