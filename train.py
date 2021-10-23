@@ -7,6 +7,7 @@ from tqdm import tqdm
 import torch 
 import torch.optim as optim
 import argparse
+import configparser
 from torch.utils.tensorboard import SummaryWriter
 
 from network.model import NetworkModel
@@ -18,8 +19,10 @@ if __name__ == '__main__':
     # make a parser
     parser = argparse.ArgumentParser()
     
+    parser.add_argument('-train_cfg', type=str, help='config file for training', dest='TRAIN_CFG', default='train.cfg')
+
     # add file locations
-    parser.add_argument('-cfg', type=str, help='config file for the network', dest='NET_CFG', default=None)
+    parser.add_argument('-net_cfg', type=str, help='config file for the network', dest='NET_CFG', default=None)
     parser.add_argument('-train', type=str, help='training images/labels directory', dest='TRAIN_FILE', default=None)
     parser.add_argument('-test', type=str, help='testing images/labels directory', dest='TEST_FILE', default=None)
     parser.add_argument('-name', type=str, help='where to save the network after training', dest='NET_NAME', default=None)
@@ -43,6 +46,14 @@ if __name__ == '__main__':
 
     # get the stuff
     args = parser.parse_args()
+
+    config = configparser.ConfigParser(inline_comment_prefixes=['#'])
+    config.read(args.TRAIN_CFG)
+
+    prefs = list(config['network-config'].keys())
+    for p in prefs:
+        globals()[p] = args.__dict__[p] if args.__dict__[p] else config[p]
+
 
 # +++ old code
 # +++ file locations
