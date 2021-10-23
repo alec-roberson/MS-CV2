@@ -11,6 +11,24 @@ from torch.utils.tensorboard import SummaryWriter
 from network.model import NetworkModel
 from datamanager import DataManager
 
+# +++ new args parse
+
+if __name__ == '__main__':
+    # make a parser
+    parser = argparse.ArgumentParser()
+    
+    # add file locations
+    parser.add_argument('-cfg', type=str, help='config file for the network', dest='NET_CFG', default=None)
+    parser.add_argument('-train', type=str, help='training images/labels directory', dest='TRAIN_FILE', default=None)
+    parser.add_argument('-test', type=str, help='testing images/labels directory', dest='TEST_FILE', default=None)
+    parser.add_argument('-name', type=str, help='where to save the network after training', dest='NET_NAME', default=None)
+    
+    # add gpu preferences
+    parser.add_argument('-cuda', type=bool, help='should cuda be used for the network', dest='CUDA', default=None)
+    parser.add_argument('-aug_cuda', type=bool, help='should data be used for data augmentation', dest='AUG_CUDA', default=None)
+    
+    # get the stuff
+    args = parser.parse_args()
 
 # +++ file locations
 NET_CFG = 'cfg/yolov3-mid-416.cfg' # 'cfg/squeezedet.cfg' # network configuration file
