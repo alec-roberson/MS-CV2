@@ -7,7 +7,6 @@ import os
 import cv2
 import numpy as np
 import torch
-import matplotlib
 import matplotlib.pyplot as plt
 from datamanager.datamanager import DataManager
 
