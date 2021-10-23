@@ -27,9 +27,23 @@ if __name__ == '__main__':
     parser.add_argument('-cuda', type=bool, help='should cuda be used for the network', dest='CUDA', default=None)
     parser.add_argument('-aug_cuda', type=bool, help='should data be used for data augmentation', dest='AUG_CUDA', default=None)
     
+    # add data preferences
+    parser.add_argument('-batch', type=int, help='batch size', dest='BATCH_SIZE', default=None)
+    parser.add_argument('-mini_batch', type=int, help='mini batch size', dest='MINI_BATCH_SIZE', default=None)
+
+    # add training preferences
+    parser.add_argument('-epochs', type=int, help='number of epochs to run for', dest='NUM_EPOCHS', default=None)
+    parser.add_argument('-write', type=int, help='tensorboard data will be written every ___ epochs', dest='WRITE_EVERY', defualt=None)
+
+    # add optimizer preferences
+    parser.add_argument('-learning', type=float, help='learning rate', dest='LEARNING_RATE', default=None)
+    parser.add_argument('-weight', type=float, help='learning rate decay', dest='WEIGHT_DECAY', default=None)
+    parser.add_argument('-momentum', type=float, help='momentum for SGD optimizer', dest='MOMENTUM', default=None)
+
     # get the stuff
     args = parser.parse_args()
 
+# +++ old code
 # +++ file locations
 NET_CFG = 'cfg/yolov3-mid-416.cfg' # 'cfg/squeezedet.cfg' # network configuration file
 TRAIN_FILE = 'data/train-data-416.pt' # training images/labels directory
