@@ -13,6 +13,9 @@ from torch.utils.tensorboard import SummaryWriter
 from network.model import NetworkModel
 from datamanager import DataManager
 
+# +++ set to None
+NET_CFG, TRAIN_FILE, TEST_FILE, NET_NAME, BATCH_SIZE, MINI_BATCH_SIZE, AUG_CUDA, DATA_AUG, CUDA, NUM_EPOCHS, WRITE_EVERY, LEARNING_RATE, WEIGHT_DECAY, MOMENTUM = None, None, None, None, None, None, None, None, None, None, None, None, None, None
+
 # +++ new args parse
 
 if __name__ == '__main__':
@@ -63,43 +66,15 @@ if __name__ == '__main__':
     for p in prefs:
         globals()[p.upper()] = args.__dict__[p.upper()] if args.__dict__[p.upper()] else config['network-config'][p]
 
-    print(WEIGHT_DECAY)
-if False:
-        
+    # +++ initializes DATA_AUG dictionary
+    DATA_AUG = {}
+    for key in globals():
+        if key.startswith('DA_'):
+            DATA_AUG[key[3:].lower()] = globals()[key]
 
-    # +++ old code
     # +++ file locations
-    NET_CFG = 'cfg/yolov3-mid-416.cfg' # 'cfg/squeezedet.cfg' # network configuration file
-    TRAIN_FILE = 'data/train-data-416.pt' # training images/labels directory
-    TEST_FILE = 'data/test-data-416.pt' # testing images/labels directory
-    NET_NAME = 'yv3m-416-test' # where to save the network after training
     TB_LOGDIR = 'runs/' + NET_NAME # log for tensorboard
     SAVE_NET = NET_NAME + '.pt' # file to save net to
-
-    # +++ data preferences
-    BATCH_SIZE = 10 # batch size
-    MINI_BATCH_SIZE = 10 # mini batch size
-    AUG_CUDA = False # should data be used for data augmentation
-    DATA_AUG = {}
-    #     'mosaics': 0.25,
-    #     'mixup': 0.25,
-    #     'cutmix': 0.25,
-    #     'cutout': 0.25,
-    #     'hflip': 0.25,
-    #     'vflip': 0.25,
-    #     'rot': 0.25
-    # }
-
-    # +++ training prefrences
-    CUDA = True # should cuda be used for the network
-    NUM_EPOCHS = 10 # number of epochs to run for
-    WRITE_EVERY = 2 # tensorboard data will be written every ___ epochs
-
-    # +++ optimizer prefrences
-    LEARNING_RATE = 0.001 # learning rate
-    WEIGHT_DECAY = 0.001 # learning rate decay
-    MOMENTUM = 0.9 # momentum for SGD optimizer
-    NESTEROV = False # nesterov SGD?
 
     # +++ set the device variable
     device = 'cuda:0' if CUDA else 'cpu'
@@ -124,8 +99,7 @@ if False:
         model.parameters(),
         lr=LEARNING_RATE,
         momentum=MOMENTUM,
-        weight_decay=WEIGHT_DECAY,
-        nesterov=NESTEROV)
+        weight_decay=WEIGHT_DECAY)
 
     # +++ tensorboard setup 
     writer = SummaryWriter(log_dir=TB_LOGDIR)
