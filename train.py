@@ -44,6 +44,15 @@ if __name__ == '__main__':
     parser.add_argument('-weight', type=float, help='learning rate decay', dest='WEIGHT_DECAY', default=None)
     parser.add_argument('-momentum', type=float, help='momentum for SGD optimizer', dest='MOMENTUM', default=None)
 
+    # add data augmentation preferences
+    parser.add_argument("-da_mosaics", type=float, help='mosaic data augmentation', dest='DA_MOSAICS', default=None)
+    parser.add_argument("-da_mixup", type=float, help='mixup data augmentation', dest='DA_MIXUP', default=None)
+    parser.add_argument("-da_cutmix", type=float, help='cut mix data augmentation', dest='DA_CUTMIX', default=None)
+    parser.add_argument("-da_cutout", type=float, help='cut out data augmentation', dest='DA_CUTOUT', default=None)
+    parser.add_argument("-da_hflip", type=float, help='horizontal flip data augmentation', dest='DA_HFLIP', default=None)
+    parser.add_argument("-da_vflip", type=float, help='vertical flip data augmentation', dest='DA_VFLIP', default=None)
+    parser.add_argument("-da_rot", type=float, help='rotation data augmentation', dest='DA_ROT', default=None)
+
     # get the stuff
     args = parser.parse_args()
 
