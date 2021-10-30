@@ -64,14 +64,14 @@ if __name__ == '__main__':
 
     prefs = list(config['network-config'].keys())
     for p in prefs:
+        arg = args.__dict__[p.upper()]
+        default = config['network-config'][p]
+
         globals()[p.upper()] = args.__dict__[p.upper()] if args.__dict__[p.upper()] else config['network-config'][p]
 
     # +++ initializes DATA_AUG dictionary
-    DATA_AUG = {}
-    for key in globals():
-        if key.startswith('DA_'):
-            DATA_AUG[key[3:].lower()] = globals()[key]
-
+    DATA_AUG = dict([(k.lower()[3:],v) for k,v in globals().items() if k.startswith('DA_')])
+    
     # +++ file locations
     TB_LOGDIR = 'runs/' + NET_NAME # log for tensorboard
     SAVE_NET = NET_NAME + '.pt' # file to save net to
