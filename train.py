@@ -65,9 +65,12 @@ if __name__ == '__main__':
     prefs = list(config['network-config'].keys())
     for p in prefs:
         arg = args.__dict__[p.upper()]
-        default = config['network-config'][p]
+        try:
+            default = eval(config['network-config'][p])
+        except:
+            default = config['network-config'][p]
 
-        globals()[p.upper()] = args.__dict__[p.upper()] if args.__dict__[p.upper()] else config['network-config'][p]
+        globals()[p.upper()] = args.__dict__[p.upper()] if args.__dict__[p.upper()] else default
 
     # +++ initializes DATA_AUG dictionary
     DATA_AUG = dict([(k.lower()[3:],v) for k,v in globals().items() if k.startswith('DA_')])
