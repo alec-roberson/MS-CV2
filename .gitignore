@@ -9,3 +9,6 @@
 
 # folders to ignore
 /runs
+
+# config
+/train.cfg
