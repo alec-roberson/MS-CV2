@@ -529,7 +529,7 @@ class DataManager:
             if true, augmented data will be generated for this set of batches.
 
         --- returns ---
-        list[list[tuple[torch.tensor, torch.tensor]]] : a list of the batches,
+        list[list[list[tuple[torch.tensor, torch.tensor]]]] : a list of the batches,
             where each batch is a list containg tuples of mini batch data, mini
             batch labels.
         OR IF mini_batch_size = None
@@ -539,9 +539,6 @@ class DataManager:
         # +++ set things up
         out_dir = mkdir(output_directory)
         ndig = ceil(log10(num_epochs))
-
-        # +++ save the data manager
-        torch.save(self, 'DataManager.pt')
 
         # +++ make the file that says all the info and shit
         lines = [
@@ -553,10 +550,8 @@ class DataManager:
             f'augmented = {augmented}',
             '\n=== GENERAL DATA INFO ===\n',
             f'data_path = {self.data_path}\n',
-            f'input_dim = {self.input_dim}\n',
-            f'num_epochs = {num_epochs}\n',
-            f'num_epochs = {num_epochs}\n',
-            f'num_epochs = {num_epochs}\n']
+            f'input_dim = {self.input_dim}\n']
+            
         # add classes
         lines.append('classes:\n')
         for i, c in enumerate(self.classes):
@@ -575,13 +570,19 @@ class DataManager:
         txtf.close()
 
         # +++ main loop
+        # list[list[list[tuple[torch.tensor, torch.tensor]]]] : a list of the batches
+        batchesList = []
+
         for i in tqdm(range(num_epochs)):
             batches = self.batches(
                 batch_size=batch_size,
                 mini_batch_size=mini_batch_size, 
                 shuffle=shuffle, augmented=augmented)
+            batchesList.append(batches)
             out_f = os.path.join(out_dir, f'epoch-{i:0>{ndig}}.pt')
             torch.save(batches, out_f)
+        
+        return batchesList
 
 class DataLoader:
     ''' DataLoader class
