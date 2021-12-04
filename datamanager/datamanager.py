@@ -56,10 +56,11 @@ class DataManager:
     columns = ['names','originals','dims','images','labels']
 
     # +++ BUILT IN METHODS
-    def __init__(self, data_path, CUDA=False, **data_aug):
+    def __init__(self, data_path, batch_size=None, mini_batch_size=None, CUDA=False, **data_aug):
         # +++ load the data
         self.data_path = os.path.realpath(data_path)
         self.data, self.classes, self.input_dim = torch.load(self.data_path)
+
         # +++ save the info about data augmentation
         self.device = _CUDA_DEVICE if CUDA else 'cpu'
         self.data_aug_dict = copy.deepcopy(data_aug)
@@ -83,6 +84,25 @@ class DataManager:
             'hflip_aug': data_aug.get('cutout', 0.0),
             'vflip_aug': data_aug.get('vflip', 0.0),
             'rand_rot_aug': data_aug.get('rot', 0.0)}
+        
+        # +++ error check mini/batch sizes
+        if (batch_size is None) and (not mini_batch_size is None):
+            raise ValueError('cannot have None batch_size and non-None '
+                f'mini_batch_size ({mini_batch_size})')
+        if (not batch_size is None) and \
+            (not mini_batch_size is None) and \
+            (batch_size % mini_batch_size != 0):
+            raise ValueError(f'batch size ({batch_size}) must be a clean '
+                f' multiple of mini batch size ({mini_batch_size})')
+
+        # +++ set mini/batch size
+        if batch_size is None:
+            batch_size = self.get_len()
+        if mini_batch_size is None:
+            mini_batch_size = batch_size
+        self.batch_size = batch_size
+        self.mini_batch_size = mini_batch_size
+        
 
     def __repr__(self):
         data_file = os.path.relpath(self.data_path)
@@ -253,8 +273,7 @@ class DataManager:
         # return
         return (batch_data, batch_labels)
 
-    def batches(self, batch_size=None, mini_batch_size=None, shuffle=True, 
-    augmented=True):
+    def batches(self, shuffle=True, augmented=True):
         ''' batches method
         this method makes batches with the perscribed hyper parameters. note
         that if mini_batch_size is NOT set, this will just return a list of
@@ -282,21 +301,6 @@ class DataManager:
         list[tuple[torch.tensor, torch.tensor]] : the list of the batches,
             where each batch is a tuple of (batch_data, batch_labels).
         '''
-        # error check
-        if (batch_size is None) and (not mini_batch_size is None):
-            raise ValueError('cannot have None batch_size and non-None '
-                f'mini_batch_size ({mini_batch_size})')
-        if (not batch_size is None) and \
-            (not mini_batch_size is None) and \
-            (batch_size % mini_batch_size != 0):
-            raise ValueError(f'batch size ({batch_size}) must be a clean '
-                f' multiple of mini batch size ({mini_batch_size})')
-        # set batch / mini batch size
-        make_mini_bs = bool(mini_batch_size)
-        if batch_size is None:
-            batch_size = self.get_len(augmented=augmented)
-        if mini_batch_size is None:
-            mini_batch_size = batch_size
         # get the data
         imgs, lbls = self.get_data(augment=augmented)
         # get the indexes to use in order, based on shuffle
@@ -305,18 +309,18 @@ class DataManager:
         else:
             idxs = torch.arange(self.get_len())
         # now make the batches
-        num_batches = self.get_len() // batch_size
-        num_mini_batches = batch_size // mini_batch_size
+        num_batches = self.get_len() // self.batch_size
+        num_mini_batches = self.batch_size // self.mini_batch_size
         batches = []
         for i in range(num_batches):
             mini_batches = []
             for j in range(num_mini_batches):
-                start_i = i*batch_size + j*mini_batch_size
-                end_i = i*batch_size + (j+1)*mini_batch_size
+                start_i = i*self.batch_size + j*self.mini_batch_size
+                end_i = i*self.batch_size + (j+1)*self.mini_batch_size
                 mini_batches.append(self._make_batch(imgs, lbls,
                     idxs[start_i : end_i]))
             # add the mini_batch (or batch) to the list
-            if make_mini_bs:
+            if self.mini_batch_size:
                 batches.append(mini_batches)
             else:
                 batches.append(mini_batches[0])
@@ -493,8 +497,7 @@ class DataManager:
         detections[:,1:5] = torch.min(detections[:,1:5], img_dims.repeat(1,2))
         return detections
 
-    def premake_batches(self, output_directory, num_epochs, batch_size=None, 
-    mini_batch_size=None, shuffle=True, augmented=True):
+    def premake_batches(self, output_directory, num_epochs, shuffle=True, augmented=True):
         ''' pre-make batches method
         this method makes a ton of epochs with the perscribed hyper params.
         these batches can then be loaded by the DataLoader class for later use
@@ -544,8 +547,8 @@ class DataManager:
         lines = [
             '=== CALL PARAMETERS ===\n',
             f'num_epochs = {num_epochs}\n',
-            f'batch_size = {batch_size}\n',
-            f'mini_batch_size = {mini_batch_size}\n',
+            f'batch_size = {self.batch_size}\n',
+            f'mini_batch_size = {self.mini_batch_size}\n',
             f'shuffle = {shuffle}\n',
             f'augmented = {augmented}',
             '\n=== GENERAL DATA INFO ===\n',
@@ -574,22 +577,30 @@ class DataManager:
         batchesList = []
 
         for i in tqdm(range(num_epochs)):
-            batches = self.batches(
-                batch_size=batch_size,
-                mini_batch_size=mini_batch_size, 
-                shuffle=shuffle, augmented=augmented)
+            batches = self.batches(shuffle=shuffle, augmented=augmented)
             batchesList.append(batches)
             out_f = os.path.join(out_dir, f'epoch-{i:0>{ndig}}.pt')
             torch.save(batches, out_f)
         
         return batchesList
 
+    def get_dataloader(self):
+        return DataLoader(datamanager=self)
+
 class DataLoader:
     ''' DataLoader class
     loads data that is saved by DataManager.premake_batches.
     
     '''
-    def __init__(self, path):
+    def __init__(self, premade_batches_path=None, datamanager=None):
+        if premade_batches_path is None and datamanager is None:
+            raise AttributeError('need one of them to not be none')
+        
+        if not datamanager is None:
+            self.mode = 0
+            self.datamanager = datamanager
+            self.classes = datamanager.classes
+            '''
         # load the relevant info from the path
         self.path = os.path.realpath(path)
         self.file_paths = list(filter(
@@ -598,7 +609,7 @@ class DataLoader:
         self.file_paths = [os.path.join(self.path, f) for f in self.file_paths]
         # setup the iterator parameters
         self.i = 0
-        self.l = len(self.file_paths)
+        self.l = len(self.file_paths)'''
 
     # +++ basic methods
     def __repr__(self):
@@ -614,6 +625,6 @@ class DataLoader:
         ''' batches
         returns the next batch in the data loader.
         '''
-        batch = torch.load(self.file_paths[self.i])
-        self.i = (self.i + 1) % self.l
-        return batch
+        if self.mode == 0:
+            return self.datamanager.batches()
+    
