@@ -91,6 +91,8 @@ if __name__ == '__main__':
     # +++ load up them datas
     train_data = DataManager(
         data_path = TRAIN_FILE,
+        batch_size=BATCH_SIZE, 
+        mini_batch_size=MINI_BATCH_SIZE,
         CUDA=AUG_CUDA,
         **DATA_AUG)
     test_data = DataManager(
@@ -159,7 +161,7 @@ if __name__ == '__main__':
     for epoch in tqdm(range(1, NUM_EPOCHS+1), 'training'):
 
         # +++ loop through batches in this epoch
-        for batch in train_data.batches(batch_size=BATCH_SIZE, mini_batch_size=MINI_BATCH_SIZE):
+        for batch in train_data.batches():
             model.zero_grad() # zero the model's gradients
 
             batch_loss = 0. # batch loss
