@@ -600,6 +600,18 @@ class DataLoader:
             self.mode = 0
             self.datamanager = datamanager
             self.classes = datamanager.classes
+        elif not premade_batches_path is None:
+            classes_path = os.path.join(premade_batches_path, "classes.pt")
+
+            self.classes = torch.load(classes_path)
+
+            self.mode = 1
+            self.premade_files = os.listdir(premade_batches_path)
+            self.premade_batches_path = premade_batches_path
+            self.premade_files.sort()
+                
+
+
             '''
         # load the relevant info from the path
         self.path = os.path.realpath(path)
@@ -627,4 +639,11 @@ class DataLoader:
         '''
         if self.mode == 0:
             return self.datamanager.batches()
-    
+        elif self.mode == 1:
+            while len(self.premade_files) != 0:
+                f = self.premade_files.pop()
+
+                if f.startswith('epoch'):
+                    break
+
+            return torch.load(os.path.join(self.premade_batches_path, f))
