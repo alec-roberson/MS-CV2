@@ -565,8 +565,8 @@ class DataManager:
             lines.append(f'{key} : {self.data_aug_dict.get(key, 0.0)}\n')
         for key in self._aug:
             lines.append(f'{key} : {self.data_aug_dict.get(key, 0.0)}\n')
-        lines.append(f"iou_threshs = {self.data_aug_dict.get('iou_threshs', (0.7,0.2))}")
-        lines.append(f"cut_range = {self.data_aug_dict.get('cut_range', (0.3, 0.5))}")
+        lines.append(f"iou_threshs = {self.data_aug_dict.get('iou_threshs', (0.7,0.2))}\n")
+        lines.append(f"cut_range = {self.data_aug_dict.get('cut_range', (0.3, 0.5))}\n")
         # save it
         txtf = open(os.path.join(out_dir, 'data-config.txt'), 'w')
         txtf.writelines(lines)
