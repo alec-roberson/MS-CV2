@@ -568,9 +568,9 @@ class DataManager:
         lines.append(f"iou_threshs = {self.data_aug_dict.get('iou_threshs', (0.7,0.2))}\n")
         lines.append(f"cut_range = {self.data_aug_dict.get('cut_range', (0.3, 0.5))}\n")
         # save it
-        txtf = open(os.path.join(out_dir, 'data-config.txt'), 'w')
-        txtf.writelines(lines)
-        txtf.close()
+        with open(os.path.join(out_dir, 'data-config.txt'), 'w') as txtf:
+            txtf.writelines(lines)
+        torch.save(self.classes, os.path.join(out_dir, 'classes.pt'))
 
         # +++ main loop
         # list[list[list[tuple[torch.tensor, torch.tensor]]]] : a list of the batches
@@ -609,19 +609,6 @@ class DataLoader:
             self.premade_files = os.listdir(premade_batches_path)
             self.premade_batches_path = premade_batches_path
             self.premade_files.sort()
-                
-
-
-            '''
-        # load the relevant info from the path
-        self.path = os.path.realpath(path)
-        self.file_paths = list(filter(
-            lambda x : x.split('.')[-1] == 'pt', os.listdir(self.path)))
-        self.file_paths.sort()
-        self.file_paths = [os.path.join(self.path, f) for f in self.file_paths]
-        # setup the iterator parameters
-        self.i = 0
-        self.l = len(self.file_paths)'''
 
     # +++ basic methods
     def __repr__(self):

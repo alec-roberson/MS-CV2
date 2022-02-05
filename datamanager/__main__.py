@@ -36,6 +36,9 @@ def trim_data(args):
     dp.save_raw(args.output_data_path,
         keep_fns = args.keep_fns)
 
+def lump_classes(args):
+    raise NotImplementedError()
+
 # +++ MAIN SCRIPT
 if __name__ == '__main__':
     # +++ imports
@@ -72,6 +75,13 @@ if __name__ == '__main__':
         help='the path to a new directory where the output data should be saved.')
     td_parser.add_argument('--keep_filenames', '-kfn', dest='keep_fns', action='store_true',
         help='if triggered, the filenames will be kept from the original directory.')
+
+    # lump classes parser
+    lc_parser = subparsers.add_parser('lc', help='lump classes together')
+    lc_parser.add_argument('new_classes', type=str, help='the path to the file containing the new set of classes.')
+    lc_parser.add_argument('class_mapping', type=str, help='the json file containing the mapping of class numbers (old -> new/str -> int).')
+    lc_parser.add_argument('data_files', type=str, nargs='+', help='the path(s) to the data file(s) that you wish to remap the classes for. you must supply an even number of arguments with each file being followed by the file you want the new data to be saved to.')
+    
 
     args = parser.parse_args()
 
