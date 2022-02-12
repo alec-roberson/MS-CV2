@@ -16,15 +16,16 @@ def parse_data(args):
         The arguments passed for data parsing.
     '''
 
-    dp = DataParser(args.data_path, args.class_names_file, args.resize_dim)
     aux_args = []
     if args.aux_out:
         for i in range(len(args.aux_out)):
             a = args.aux_out[i]
             if i % 2 == 1:
-                aux_args.append(int(i))
+                aux_args.append(float(a))
             else:
                 aux_args.append(str(a))
+    
+    dp = DataParser(args.data_path, args.class_names_file, args.resize_dim)
     out = dp.save(args.default_fn, *aux_args, shuffle=args.shuffle)
     for f, n in out:
         print(f'file \'{f}\' contains {n} data points')
@@ -68,6 +69,7 @@ if __name__ == '__main__':
     pd_parser.add_argument('-o', '--out', dest='default_fn', type=str, default='data',
         help='the default file to save data to (defualt=data)')
     pd_parser.add_argument('-a', '--aux-out', dest='aux_out', type=str, default=None,
+        nargs='*',
         help='auxillary data output, list file names immediately followed by '
         'the percentage of data between 0 and 1 that should be allocated to the file.')
     pd_parser.add_argument('--no-shuffle', dest='shuffle', action='store_false',
