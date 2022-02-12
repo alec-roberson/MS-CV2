@@ -93,7 +93,7 @@ class DataManager:
             (not mini_batch_size is None) and \
             (batch_size % mini_batch_size != 0):
             raise ValueError(f'batch size ({batch_size}) must be a clean '
-                f' multiple of mini batch size ({mini_batch_size})')
+                f'multiple of mini batch size ({mini_batch_size})')
 
         # +++ set mini/batch size
         if batch_size is None:

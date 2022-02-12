@@ -15,10 +15,19 @@ def parse_data(args):
     args : argparse.Namespace
         The arguments passed for data parsing.
     '''
+
     dp = DataParser(args.data_path, args.class_names_file, args.resize_dim)
-    train, test = dp.save(args.train_out, args.test_out, test_pct=args.pct_test, shuffle=args.shuffle)
-    print(f'training set \'{args.train_out}\' contains {train} images')
-    print(f'testing set \'{args.test_out}\' contains {test} images')
+    aux_args = []
+    if args.aux_out:
+        for i in range(len(args.aux_out)):
+            a = args.aux_out[i]
+            if i % 2 == 1:
+                aux_args.append(int(i))
+            else:
+                aux_args.append(str(a))
+    out = dp.save(args.default_fn, *aux_args, shuffle=args.shuffle)
+    for f, n in out:
+        print(f'file \'{f}\' contains {n} data points')
 
 def trim_data(args):
     ''' trim_data function
@@ -56,14 +65,15 @@ if __name__ == '__main__':
         help='the path to the file containing the ordered class names')
     pd_parser.add_argument('resize_dim', type=int,
         help='the size that each image will be resized to in the resulting dataset')
-    pd_parser.add_argument('--train-out', dest='train_out', type=str, default='train-data',
-        help='the path to the output file for the training data with no extension (defualt=train-data)')
-    pd_parser.add_argument('--test-out', dest='test_out', type=str, default='test-data',
-        help='the path to the output file for the testing data with no extension (defualt=test-data)')
-    pd_parser.add_argument('--pct-test', dest='pct_test', type=float, default=0.1,
-        help='the percentage of data that should be allocated to testing')
+    pd_parser.add_argument('-o', '--out', dest='default_fn', type=str, default='data',
+        help='the default file to save data to (defualt=data)')
+    pd_parser.add_argument('-a', '--aux-out', dest='aux_out', type=str, default=None,
+        help='auxillary data output, list file names immediately followed by '
+        'the percentage of data between 0 and 1 that should be allocated to the file.')
     pd_parser.add_argument('--no-shuffle', dest='shuffle', action='store_false',
         help='if added, the data will not be shuffled')
+
+        
 
     # trim data parser
     td_parser = subparsers.add_parser('td', help='trim out bad data from the dataset')
