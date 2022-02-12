@@ -165,18 +165,18 @@ class DataParser:
             load_labels(raw_data_path, fnames)), axis=1)
         self.resize_dim = resize_dim
 
-    def save(self, train_fn, test_fn, test_pct=0.1, shuffle=True):
+    def save(self, default_fn='data', *fns_and_pcts, shuffle=True):
         ''' save data method
         splits the data into a training and testing set, and then saves both to
         binary .pt files.
 
         --- args ---
-        train_fn : str
-            the filename (no extension!) to save the training set to.
-        test_fn : str
-            the filename (no extension!) to save the test set to.
-        test_pct : float, optional (default=0.1)
-            the percentage of data that should be allocated to testing.
+        default_fn : str, optional (default='data')
+            The default filename (no extension) to save the data to.
+        *fns_and_pcts
+            Other files that data should be allocated to. Each filename should
+            be immediately followed by a float between 0 and 1 indicating the
+            percentage of data to allocate to said file.
         shuffle : bool, optional (defualt=True)
             should the data be shuffled before being saved.
         
@@ -188,12 +188,31 @@ class DataParser:
         data = self.data.copy()
         # shuffle it
         if shuffle: np.random.shuffle(data)
-        # figure out how much data to allocate to training
-        test_n = int(data.shape[0] * test_pct)
-        # split and save the data and class names
-        torch.save((data[:test_n], self.classes, self.resize_dim), f'{test_fn}.pt')
-        torch.save((data[test_n:], self.classes, self.resize_dim), f'{train_fn}.pt')
-        return data.shape[0] - test_n, test_n
+        # unpack the input filenames
+        fns_and_pcts = list(fns_and_pcts)
+        n_aux_files = int(len(fns_and_pcts)/2)
+        fns = []
+        pcts = []
+        if len(fns_and_pcts) % 2 != 0:
+            raise ValueError('DataParser.save was not given an even number of arguments. Each file must be followed with a percentage of data to allocate to that file.')
+        else:
+            for i in range(0, len(fns_and_pcts), 2):
+                fns.append(fns_and_pcts[i])
+                pcts.append(fns_and_pcts[i+1])
+            if sum(pcts) > 1:
+                raise ValueError('DataParser.save was given a total percentage of data to save >100%')
+        # get indexes to portion out the data
+        N = data.shape[0]
+        idxs = [0] + [int(p*N) for p in pcts]
+        # loop to split up and save the data
+        out = []
+        for i in range(n_aux_files):
+            num = idxs[i+1] - idxs[i] - 1
+            out.append((f'{fns[i]}.pt', num))
+            torch.save((data[idxs[i]:idxs[i+1]], self.classes, self.resize_dim), f'{fns[i]}.pt')
+        torch.save((data[idxs[-1]:], self.classes, self.resize_dim), f'{default_fn}.pt')
+        out.append((f'{default_fn}.pt', N - idxs[-1]))
+        return out
     
     def save_raw(self, output_dir:str, keep_fns=False, round_lbls_to=6) -> None:
         ''' save_raw
