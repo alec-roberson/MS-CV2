@@ -1,17 +1,18 @@
 import argparse
 
 if __name__ == '__main__':
-    # make a parser and the arguments
-    parser = argparse.ArgumentParser()
-    parser.add_argument('cfg_file', type=str, help='config file for the network')
-    parser.add_argument('-name', '--net-name', type=str, help='name the network is given', dest='net_name', default=None)
-    parser.add_argument('-n', '--num-epochs', type=int, help='number of epochs to train for', default=32, dest='num_epochs')
-    # get the stuff
-    args = parser.parse_args()
+    DATA_AUG = dict(
+        mosaics = 0.25,
+        mixup = 0.25,
+        cutmix = 0.25,
+        cutout = 0.25,
+        hflip = 0.25,
+        vflip = 0.25,
+        rot = 0.25)
     
-    
-    print(f'config file: \'{args.cfg_file}\'')
-    print(f'network name: \'{args.net_name}\'')
-    if args.net_name:
-        # 
-    print(f'number of epochs: \'{args.num_epochs}\'')
+    from datamanager import DataManager, DataLoader
+
+    # dl = DataLoader('premade-batches')
+    # dm = DataManager('data/test-416.pt', batch_size=32, mini_batch_size=16, CUDA=True, **DATA_AUG)
+    dm = DataManager('data/train-416.pt', batch_size=32, mini_batch_size=16, CUDA=True, **DATA_AUG)
+
