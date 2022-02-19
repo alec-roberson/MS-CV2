@@ -3,6 +3,8 @@ this file trains the network.
 '''
 
 # +++ imports
+from cgi import test
+import os
 from tqdm import tqdm
 import torch 
 import torch.optim as optim
@@ -11,10 +13,10 @@ import configparser
 from torch.utils.tensorboard import SummaryWriter
 
 from network.model import NetworkModel
-from datamanager import DataManager
+from datamanager import DataManager, DataLoader
 
 # +++ set to None
-NET_CFG, TRAIN_FILE, TEST_FILE, NET_NAME, BATCH_SIZE, MINI_BATCH_SIZE, AUG_CUDA, DATA_AUG, CUDA, NUM_EPOCHS, WRITE_EVERY, LEARNING_RATE, WEIGHT_DECAY, MOMENTUM = None, None, None, None, None, None, None, None, None, None, None, None, None, None
+NET_CFG, TRAIN_DATA, TEST_FILE, NET_NAME, BATCH_SIZE, MINI_BATCH_SIZE, AUG_CUDA, DATA_AUG, CUDA, NUM_EPOCHS, WRITE_EVERY, LEARNING_RATE, WEIGHT_DECAY, MOMENTUM = None, None, None, None, None, None, None, None, None, None, None, None, None, None
 
 # +++ new args parse
 
@@ -26,7 +28,7 @@ if __name__ == '__main__':
 
     # add file locations
     parser.add_argument('-net_cfg', type=str, help='config file for the network', dest='NET_CFG', default=None)
-    parser.add_argument('-train', type=str, help='training images/labels directory', dest='TRAIN_FILE', default=None)
+    parser.add_argument('-train', type=str, help='the path to the training data, or the directory containing premade batches', dest='TRAIN_DATA', default=None)
     parser.add_argument('-test', type=str, help='testing images/labels directory', dest='TEST_FILE', default=None)
     parser.add_argument('-name', type=str, help='where to save the network after training', dest='NET_NAME', default=None)
     
@@ -56,20 +58,23 @@ if __name__ == '__main__':
     parser.add_argument("-da_vflip", type=float, help='vertical flip data augmentation', dest='DA_VFLIP', default=None)
     parser.add_argument("-da_rot", type=float, help='rotation data augmentation', dest='DA_ROT', default=None)
 
-    # get the stuff
+    # get the arguments from the parser
     args = parser.parse_args()
 
+    # +++ parse the training config file
     config = configparser.ConfigParser(inline_comment_prefixes=['#'])
     config.read(args.TRAIN_CFG)
 
+    # go through the prefrences
     prefs = list(config['network-config'].keys())
     for p in prefs:
+        # get the default for this argument
         arg = args.__dict__[p.upper()]
         try:
             default = eval(config['network-config'][p])
         except:
             default = config['network-config'][p]
-
+        # override the global variable for this argument if a different one was given
         globals()[p.upper()] = args.__dict__[p.upper()] if args.__dict__[p.upper()] else default
 
     # +++ initializes DATA_AUG dictionary
@@ -89,15 +94,19 @@ if __name__ == '__main__':
     model.train() # put in training mode
 
     # +++ load up them datas
-    train_data = DataManager(
-        data_path = TRAIN_FILE,
-        batch_size=BATCH_SIZE, 
-        mini_batch_size=MINI_BATCH_SIZE,
-        CUDA=AUG_CUDA,
-        **DATA_AUG)
+    if os.path.isdir(TRAIN_DATA):
+        train_data = DataLoader(premade_batches_path=TRAIN_DATA)
+        # assert (train_data.batch_size == BATCH_SIZE), f"premade batch size ({train_data.batch_size}) does not match specified batch size ({BATCH_SIZE})"
+        # assert (train_data.mini_batch_size == MINI_BATCH_SIZE), f"premade mini batch size ({train_data.mini_batch_size}) does not match specified mini batch size ({MINI_BATCH_SIZE})"
+    else:
+        train_data = DataManager(
+            data_path=TRAIN_DATA,
+            batch_size=BATCH_SIZE, 
+            mini_batch_size=MINI_BATCH_SIZE,
+            CUDA=AUG_CUDA,
+            **DATA_AUG)
     test_data = DataManager(
-        data_path = TEST_FILE,
-        CUDA=AUG_CUDA)
+        data_path = TEST_FILE)
 
     # +++ setup the optimizer and shit
     optimizer = optim.SGD(
@@ -111,14 +120,14 @@ if __name__ == '__main__':
 
     # +++ test network function
     def test_model():
-        # get the data and targets to test on
-        data, targets = test_data.batches()[0]
-        data, targets = data.to(device), targets.to(device)
-        
         # test the network
         model.eval()
         with torch.no_grad():
-            _, loss = model(data, targets=targets)
+            x, y = test_data.batches()[0][0]
+            x = x.to(device)
+            y = y.to(device)
+            _, epoch_loss = model(x, targets=y)
+            loss = epoch_loss
         model.train()
         
         # return the loss

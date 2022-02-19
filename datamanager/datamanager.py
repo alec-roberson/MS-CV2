@@ -81,7 +81,7 @@ class DataManager:
                 'cut_range': cut_range,
                 'iou_thresh': iou_threshs[0]}}
         self._aug = {
-            'hflip_aug': data_aug.get('cutout', 0.0),
+            'hflip_aug': data_aug.get('hflip', 0.0),
             'vflip_aug': data_aug.get('vflip', 0.0),
             'rand_rot_aug': data_aug.get('rot', 0.0)}
         
@@ -102,7 +102,6 @@ class DataManager:
             mini_batch_size = batch_size
         self.batch_size = batch_size
         self.mini_batch_size = mini_batch_size
-        
 
     def __repr__(self):
         data_file = os.path.relpath(self.data_path)
@@ -550,25 +549,20 @@ class DataManager:
             f'batch_size = {self.batch_size}\n',
             f'mini_batch_size = {self.mini_batch_size}\n',
             f'shuffle = {shuffle}\n',
-            f'augmented = {augmented}',
-            '\n=== GENERAL DATA INFO ===\n',
+            f'augmented = {augmented}\n',
+            '\n\n\n=== GENERAL DATA INFO ===\n',
             f'data_path = {self.data_path}\n',
             f'input_dim = {self.input_dim}\n']
-            
-        # add classes
-        lines.append('classes:\n')
-        for i, c in enumerate(self.classes):
-            lines.append(f'\t#{i} = {c}\n')
         # add data aug info
-        lines.append('\n=== DATA AUGMENTATION INFO ===\n')
+        lines.append('\n\n\n=== DATA AUGMENTATION INFO ===\n')
         for key in self._make_aug:
             lines.append(f'{key} : {self.data_aug_dict.get(key, 0.0)}\n')
         for key in self._aug:
             lines.append(f'{key} : {self.data_aug_dict.get(key, 0.0)}\n')
         lines.append(f"iou_threshs = {self.data_aug_dict.get('iou_threshs', (0.7,0.2))}\n")
         lines.append(f"cut_range = {self.data_aug_dict.get('cut_range', (0.3, 0.5))}\n")
-        # save it
-        with open(os.path.join(out_dir, 'data-config.txt'), 'w') as txtf:
+        # save the info file
+        with open(os.path.join(out_dir, 'data-info.txt'), 'w') as txtf:
             txtf.writelines(lines)
         torch.save(self.classes, os.path.join(out_dir, 'classes.pt'))
 
@@ -595,7 +589,6 @@ class DataLoader:
     def __init__(self, premade_batches_path=None, datamanager=None):
         if premade_batches_path is None and datamanager is None:
             raise AttributeError('need one of them to not be none')
-        
         if not datamanager is None:
             self.mode = 0
             self.datamanager = datamanager
@@ -609,11 +602,27 @@ class DataLoader:
             self.premade_files = os.listdir(premade_batches_path)
             self.premade_batches_path = premade_batches_path
             self.premade_files.sort()
+            self.probe_data()
+    
+    def probe_data(self):
+        ''' Probe data method
+        This method looks at the first file of the premade batches and
+        determines batch_size and mini_batch_size.
+        '''
+        for f in self.premade_files:
+            if f.startswith('epoch'): break
+        first_batches = torch.load(os.path.join(self.premade_batches_path, f))
+        self.mini_batch_size = len(first_batches[0][0][0])
+        self.batch_size = self.mini_batch_size * len(first_batches[0][0])
+
 
     # +++ basic methods
     def __repr__(self):
         ''' string representation of data loader '''
-        return f'DataLoader({self.path})'
+        if self.mode == 0:
+            return f'DataLoader({self.datamanager.__repr__()})'
+        elif self.mode == 1:
+            return f'DataLoader("{self.premade_batches_path}")'
 
     def __len__(self):
         ''' length of data loader (total # of batches)'''
