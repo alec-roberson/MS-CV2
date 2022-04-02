@@ -6,6 +6,8 @@
 # data stuff
 /*.pt
 /raw-data*
+class-names*.txt
+premade-batches/
 
 # folders to ignore
 /runs
