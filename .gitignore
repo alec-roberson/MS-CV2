@@ -8,6 +8,7 @@
 /raw-data*
 class-names*.txt
 premade-batches/
+/*.weights
 
 # folders to ignore
 /runs
