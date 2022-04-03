@@ -98,7 +98,7 @@ class DetBlock(nn.Module):
 
         # +++ calculate offsets for each cell in the grid
         grid_range = torch.arange(g).to(self.device) # range of the grid
-        self.grid_y, self.grid_x = torch.meshgrid(grid_range, grid_range) # y/x offsets
+        self.grid_y, self.grid_x = torch.meshgrid(grid_range, grid_range, indexing='ij') # y/x offsets
         
         # unsqueeze and make float tensors
         self.grid_x = self.grid_x.view(1,1,g,g).float()
