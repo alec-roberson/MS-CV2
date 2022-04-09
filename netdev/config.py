@@ -218,7 +218,14 @@ def read_cfg(configFile):
             block['name'] = None # set it to None
         else:
             block['name'] = str(block['name']) # make sure it's a string
-        
+
+        # special case for setting bias of convolutional blocks
+        if block['type'] == 'convolutional':
+            if 'batch_normalize' in block and block['batch_normalize']:
+                block['bias'] = False
+            else:
+                block['bias'] = True
+
         # loop to set defaults
         for arg in block_args:
             default = block_args[arg] # get the default value
